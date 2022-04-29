@@ -10,4 +10,4 @@ This Chataigne module facilitates the mapping of external sources to grandMA3 vi
 
 Activate OSC in grandMA3 in the "In & Out" menu. The OSC input must be activated globally (top right) and an input source must be created. The screenshot shows a simple configuration as an example.
 
-![screenshot](https://github.com/yastefan/grandMA3-Chataigne-Module/blob/main/screenshot.jpg)
+![screenshot](https://github.com/yastefan/grandMA3-Chataigne-Module/blob/main/screenshot.png)
