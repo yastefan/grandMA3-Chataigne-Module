@@ -1,0 +1,114 @@
+{
+  "name":"grandMA3",
+  "type":"OSC",
+  "path":"Software",
+  
+  "version":"1.0.0",
+  "description":"A Chataigne module to control grandMA3 via OSC",
+  "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
+  "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
+
+  "hasInput":false,
+  "hasOutput":true, 
+
+  "hideDefaultCommands":true,
+  
+  "defaults":
+  {	
+    "autoAdd":false,
+    "oscInput": {"localPort":9001}
+  },
+
+  "parameters":
+  {
+    "Fader range":
+    {
+      "type":"Float",
+      "default": 100
+    }
+  },
+
+  "hideDefaultParameters": ["autoAdd", "colorSendMode", "useHierarchy", "autoFeedback", ],
+  "scripts": ["grandMA3.js"],
+
+  "values":
+  {
+    "Blind": {"type": "Boolean"},
+    "Freeze": {"type": "Boolean"},
+  },
+
+  "commands":
+  {
+   
+   "Move Fader":
+    {
+      "menu":"",  
+      "callback":"moveFader",
+      "parameters":
+      {
+        "Page": {"type":"Integer","min":1,"max":9,"default":1},
+        "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
+      }
+    },
+    "Push Button":
+    {
+      "menu":"",  
+      "callback":"pushButton",
+      "parameters":
+      {
+        "Page": {"type":"Integer","min":1,"max":9,"default":1, "editable":false},
+        "Executor": {"type": "Integer", "min":1, "max":490, "default":101},
+        "Value": {"type": "Boolean", "default":0, "editable":false}
+      }
+    },
+    "Change Sequence Fader":
+    {
+      "menu":"",  
+      "callback":"changeSequenceFader",
+      "parameters":
+      {
+        "SequenceNumber": {"type":"Integer","min":1,"max":100,"default":1},
+        "Fader": {"type":"Enum", "options": {
+          "Master": "FaderMaster", 
+          "Speed": "FaderSpeed", 
+          "X": "FaderX",
+          "XA": "FaderXA",
+          "XB": "FaderXB",
+          "Temp": "FaderTemp",
+          "Rate": "FaderRate",
+          "Time": "FaderTime"
+          } 
+        },
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
+      }
+    },
+    "Send Command":
+    {
+      "menu":"",  
+      "callback":"sendCommand",
+      "parameters":
+      {
+        "command": {"type":"String", "default":"clear"},
+      }
+    },
+    "Set Blind":
+    {
+      "menu":"",  
+      "callback":"setBlind",
+      "parameters":
+      {
+        "status": {"type":"Boolean", "default":0},
+      }
+    },
+    "Set Freeze":
+    {
+      "menu":"",  
+      "callback":"setFreeze",
+      "parameters":
+      {
+        "status": {"type":"Boolean", "default":0},
+      }
+    }
+  }
+}
