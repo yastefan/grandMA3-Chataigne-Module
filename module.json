@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"1.0.0",
+  "version":"0.1.0",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -40,10 +40,10 @@
   "commands":
   {
    
-   "Move Fader":
+   "Move Executor Fader":
     {
       "menu":"",  
-      "callback":"moveFader",
+      "callback":"moveExecutorFader",
       "parameters":
       {
         "Page": {"type":"Integer","min":1,"max":9,"default":1},
@@ -51,10 +51,10 @@
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
       }
     },
-    "Push Button":
+    "Push Executor Button":
     {
       "menu":"",  
-      "callback":"pushButton",
+      "callback":"pushExecutorButton",
       "parameters":
       {
         "Page": {"type":"Integer","min":1,"max":9,"default":1, "editable":false},
@@ -62,25 +62,63 @@
         "Value": {"type": "Boolean", "default":0, "editable":false}
       }
     },
-    "Change Sequence Fader":
+    "Move Sequence Fader":
     {
       "menu":"",  
-      "callback":"changeSequenceFader",
+      "callback":"moveSequenceFader",
       "parameters":
       {
-        "SequenceNumber": {"type":"Integer","min":1,"max":100,"default":1},
-        "Fader": {"type":"Enum", "options": {
-          "Master": "FaderMaster", 
-          "Speed": "FaderSpeed", 
-          "X": "FaderX",
-          "XA": "FaderXA",
-          "XB": "FaderXB",
-          "Temp": "FaderTemp",
-          "Rate": "FaderRate",
-          "Time": "FaderTime"
-          } 
+        "SequenceNumber": {"type":"Integer","min":1,"max":9999,"default":1},
+        "Fader": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Master": "FaderMaster", 
+            "Speed": "FaderSpeed", 
+            "X": "FaderX",
+            "XA": "FaderXA",
+            "XB": "FaderXB",
+            "Temp": "FaderTemp",
+            "Rate": "FaderRate",
+            "Time": "FaderTime"
+          }
         },
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
+      }
+    },
+    "Push Sequence Button":
+    {
+      "menu":"",  
+      "callback":"pushSequenceButton",
+      "parameters":
+      {
+        "SequenceNumber": {"type":"Integer","min":1,"max":9999,"default":1},
+        "Button": 
+        {
+          "type":"Enum", "options": 
+          {
+            ">>>": ">>>",
+            "<<<": "<<<",
+            "Black": "Black",
+            "Flash": "Flash",
+            "Go+": "Go+",
+            "Go-": "Go-",
+            "LearnSpeed": "LearnSpeed",
+            "On": "On",
+            "Off": "Off",
+            "Pause": "Pause",
+            "Rate1": "Rate1",
+            "Select": "Select",
+            "SelFix": "SelFix",
+            "Speed1": "Speed1",
+            "Swop": "Swop",
+            "Time": "Time",
+            "Temp": "Temp",
+            "Toggle": "Toggle",
+            "Top": "Top"
+          }
+        },
+        "Value": {"type": "Boolean", "default":0}
       }
     },
     "Send Command":

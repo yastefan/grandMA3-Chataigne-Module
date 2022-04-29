@@ -25,20 +25,24 @@ function moduleValueChanged(value) {
   }
 }
 
-function changeSequenceFader(sequenceNumber, fader, value) {
-  var range = local.parameters.faderRange.get();
-  script.log(fader, value);
-  local.send("/13.13.1.5." + sequenceNumber, fader, 1, value*range);
-}
-
-function moveFader(page, executor, value) {
+function moveExecutorFader(page, executor, value) {
   var range = local.parameters.faderRange.get();
   local.send("/Page" + page + "/Fader" + executor + "/", value*range);
 }
 
-function pushButton(page, executor, value) {
+function pushExecutorButton(page, executor, value) {
+  if(value) value = 1;
+  local.send("/Page" + page + "/Key" + executor + "/", value);
+}
+
+function moveSequenceFader(sequenceNumber, fader, value) {
   var range = local.parameters.faderRange.get();
-  local.send("/Page" + page + "/Key" + executor + "/", value*range);
+  local.send("/13.13.1.5." + sequenceNumber, fader, 1, value*range);
+}
+
+function pushSequenceButton(sequenceNumber, button, value) {
+  if(value) value = 1;
+  local.send("/13.13.1.5." + sequenceNumber, button, value);
 }
 
 function sendCommand(command) {
