@@ -28,13 +28,13 @@
     }
   },
 
-  "hideDefaultParameters": ["autoAdd", "colorSendMode", "useHierarchy", "autoFeedback", ],
+  "hideDefaultParameters": ["autoAdd", "colorSendMode", "useHierarchy", "autoFeedback"],
   "scripts": ["grandMA3.js"],
 
   "values":
   {
     "Blind": {"type": "Boolean"},
-    "Freeze": {"type": "Boolean"},
+    "Freeze": {"type": "Boolean"}
   },
 
   "commands":
@@ -49,7 +49,7 @@
         "Page": {"type":"Integer","min":1,"max":9,"default":1},
         "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
         "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"}, 
-        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "useForMapping": true}
       }
     },
     "Push Executor Button":
@@ -61,7 +61,7 @@
         "Page": {"type":"Integer","min":1,"max":9,"default":1, "editable":false},
         "Executor": {"type": "Integer", "min":1, "max":490, "default":101},
         "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"},
-        "Value": {"type": "Boolean", "default":0, "editable":false}
+        "Value": {"type": "Boolean", "default":0, "useForMapping": true}
       }
     },
     "Move Sequence Fader":
@@ -86,7 +86,7 @@
             "Time": "FaderTime"
           }
         },
-        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0}
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "useForMapping": true}
       }
     },
     "Push Sequence Button":
@@ -122,7 +122,7 @@
             "Top": "Top"
           }
         },
-        "Value": {"type": "Boolean", "default":0}
+        "Value": {"type": "Boolean", "default":0, "useForMapping": true}
       }
     },
     "Send Command":
@@ -131,7 +131,7 @@
       "callback":"sendCommand",
       "parameters":
       {
-        "command": {"type":"String", "default":"clear"},
+        "command": {"type":"String", "default":"clear"}
       }
     },
     "Set Blind":
@@ -140,7 +140,7 @@
       "callback":"setBlind",
       "parameters":
       {
-        "status": {"type":"Boolean", "default":0},
+        "status": {"type":"Boolean", "default":0, "useForMapping": true}
       }
     },
     "Set Freeze":
@@ -149,7 +149,7 @@
       "callback":"setFreeze",
       "parameters":
       {
-        "status": {"type":"Boolean", "default":0},
+        "status": {"type":"Boolean", "default":0, "useForMapping": true}
       }
     }
   }
