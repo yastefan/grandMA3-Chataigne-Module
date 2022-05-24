@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.2.0",
+  "version":"0.3.0",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -25,6 +25,11 @@
     {
       "type":"Float",
       "default": 100
+    },
+    "Learn from oscInput":
+    {
+      "type": "Boolean",
+      "default": false
     }
   },
 
@@ -33,6 +38,7 @@
 
   "values":
   {
+    "Preview": {"type": "Boolean"},
     "Blind": {"type": "Boolean"},
     "Freeze": {"type": "Boolean"}
   },
@@ -107,7 +113,9 @@
             "Flash": "Flash",
             "Go+": "Go+",
             "Go-": "Go-",
+            "Goto": "Goto",
             "LearnSpeed": "LearnSpeed",
+            "Load": "Load",
             "On": "On",
             "Off": "Off",
             "Pause": "Pause",
@@ -132,6 +140,15 @@
       "parameters":
       {
         "command": {"type":"String", "default":"clear"}
+      }
+    },
+    "Set Preview":
+    {
+      "menu":"",  
+      "callback":"setPreview",
+      "parameters":
+      {
+        "status": {"type":"Boolean", "default":0, "useForMapping":true}
       }
     },
     "Set Blind":

@@ -1,3 +1,5 @@
+var sequenceContainer = {};
+
 function init() {
   script.log("grandMA3 module loaded");
 }
@@ -7,7 +9,15 @@ function moduleParameterChanged(param) {
 }
 
 function moduleValueChanged(value) {
-  if(value.name == "blind") {
+  if(value.name == "preview") {
+    if(value.get()) {
+      local.send("/cmd", "preview on");
+    }
+    else {
+      local.send("/cmd", "preview off");
+    }
+  }
+  else if(value.name == "blind") {
     if(value.get()) {
       local.send("/cmd", "blind on");
     }
@@ -51,6 +61,16 @@ function pushSequenceButton(sequenceNumber, button, value) {
 
 function sendCommand(command) {
   local.send("/cmd", command);
+}
+
+function setPreview(onStatus) {
+  local.values.preview.set(onStatus);
+  if(onStatus) {
+    local.send("/cmd", "preview on");
+  }
+  else {
+    local.send("/cmd", "preview off");
+  }
 }
 
 function setBlind(onStatus) {
