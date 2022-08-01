@@ -59,6 +59,11 @@ function pushSequenceButton(sequenceNumber, offset, button, value) {
   local.send("/13.13.1.5." + sequenceNumber, button, value);
 }
 
+function turnEncoder(encoder, multiplicator, value) {
+  script.log("Attribute " + encoder + " at + " + value*multiplicator);
+  local.send("/cmd", "Attribute " + encoder + " at + " + value*multiplicator);
+}
+
 function sendCommand(command) {
   local.send("/cmd", command);
 }

@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.4.0",
+  "version":"0.5.0",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -131,6 +131,25 @@
           }
         },
         "Value": {"type": "Boolean", "default":0, "useForMapping":true}
+      }
+    },
+    "Turn Encoder":
+    {
+      "menu":"",  
+      "callback":"turnEncoder",
+      "parameters":
+      {
+        "Encoder": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Dimmer": "Dimmer",
+            "Pan": "Pan",
+            "Tilt": "Tilt"
+          }
+        },
+        "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement"},
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "useForMapping":true}
       }
     },
     "Send Command":
