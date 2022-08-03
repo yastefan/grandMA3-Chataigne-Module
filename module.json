@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.5.0",
+  "version":"0.6.0",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -133,6 +133,47 @@
         "Value": {"type": "Boolean", "default":0, "useForMapping":true}
       }
     },
+    "Move GrandMaster Fader":
+    {
+      "menu":"",  
+      "callback":"moveGrandMasterFader",
+      "parameters":
+      {
+        "GrandMaster": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Master": "1", 
+            "World": "2", 
+            "Highlite": "3",
+            "Lowlight": "4",
+            "Solo": "5",
+            "Rate": "6",
+            "Speed": "7",
+            "ProgramTime": "8",
+            "ProgramXFade": "9",
+            "ExecutorTime": "10",
+            "ExecutorXFade": "11",
+            "ProgramSpeed": "12",
+            "Blind": "13",
+            "SoundOut": "14",
+            "SoundIn": "15",
+            "SoundFade": "16"
+          }
+        },
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "useForMapping":true}
+      }
+    },
+    "Move SpeedMaster Fader":
+    {
+      "menu":"",  
+      "callback":"moveSpeedMasterFader",
+      "parameters":
+      {
+        "SpeedMaster": {"type": "Integer", "min":1, "max":16, "default":1, "description":"The number of the SpeedMaster"},
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "useForMapping":true}
+      }
+    },
     "Turn Encoder":
     {
       "menu":"",  
@@ -145,7 +186,15 @@
           {
             "Dimmer": "Dimmer",
             "Pan": "Pan",
-            "Tilt": "Tilt"
+            "Tilt": "Tilt",
+            "Color1": "Color1",
+            "ColorRGB_R": "ColorRGB_R",
+            "ColorRGB_G": "ColorRGB_G",
+            "ColorRGB_B": "ColorRGB_B",
+            "ColorRGB_W": "ColorRGB_W",
+            "ColorRGB_WW": "ColorRGB_WW",
+            "ColorRGB_CW": "ColorRGB_CW",
+            "ColorRGB_UV": "ColorRGB_UV"
           }
         },
         "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement"},

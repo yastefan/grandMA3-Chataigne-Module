@@ -59,6 +59,16 @@ function pushSequenceButton(sequenceNumber, offset, button, value) {
   local.send("/13.13.1.5." + sequenceNumber, button, value);
 }
 
+function moveGrandMasterFader(grandMaster, value) {
+  var range = local.parameters.faderRange.get();
+  local.send("/13.12.2." + grandMaster, "FaderMaster", 1, value*range);
+}
+
+function moveSpeedMasterFader(speedMaster, value) {
+  var range = local.parameters.faderRange.get();
+  local.send("/13.12.3." + speedMaster, "FaderMaster", 1, value*range);
+}
+
 function turnEncoder(encoder, multiplicator, value) {
   script.log("Attribute " + encoder + " at + " + value*multiplicator);
   local.send("/cmd", "Attribute " + encoder + " at + " + value*multiplicator);
