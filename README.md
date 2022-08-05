@@ -21,7 +21,7 @@ The following functions are implemented in the plugin:
 - Set Blind
 - Set Freeze
 
-The range of functions depends on the interface. For the executor faders and buttons, the function is determined by GrandMA3 on the playback side. The sequence faders and buttons can take on any functionality. So it is possible for example to map "Swop", "Speed", "Flash" and "Learn" of a sequence without making a setting in GrandMA3.
+The range of functions depends on the interface. For the executor faders and buttons, the function is determined by GrandMA3 on the playback page. The sequence faders and buttons can take on any functionality. So it is possible for example to map "Swop", "Speed", "Flash" and "Learn" of a sequence without making a setting in GrandMA3.
 
 ## Usage
 
