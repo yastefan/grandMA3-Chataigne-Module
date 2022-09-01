@@ -3,10 +3,10 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.6.0",
+  "version":"0.7.0",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
-  "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
+  "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/master.zip",
 
   "hasInput":false,
   "hasOutput":true, 
