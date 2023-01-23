@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.7.0",
+  "version":"0.7.1",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -194,7 +194,9 @@
             "ColorRGB_W": "ColorRGB_W",
             "ColorRGB_WW": "ColorRGB_WW",
             "ColorRGB_CW": "ColorRGB_CW",
-            "ColorRGB_UV": "ColorRGB_UV"
+            "ColorRGB_UV": "ColorRGB_UV",
+            "Blower1": "Blower1",
+            "Haze1": "Haze1"
           }
         },
         "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement"},
