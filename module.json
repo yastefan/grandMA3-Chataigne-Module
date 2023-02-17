@@ -164,6 +164,23 @@
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "mappingIndex": 0}
       }
     },
+    "Move GrandMaster BPM Fader":
+    {
+      "menu":"",  
+      "callback":"moveGrandMasterBpmFader",
+      "parameters":
+      {
+        "GrandMaster": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Speed": "7",
+            "ProgramSpeed": "12"
+          }
+        },
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":240, "default":0, "mappingIndex": 0}
+      }
+    },
     "Move SpeedMaster Fader":
     {
       "menu":"",  
@@ -172,6 +189,16 @@
       {
         "SpeedMaster": {"type": "Integer", "min":1, "max":16, "default":1, "description":"The number of the SpeedMaster"},
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "mappingIndex": 0}
+      }
+    },
+    "Move SpeedMaster BPM Fader":
+    {
+      "menu":"",  
+      "callback":"moveSpeedMasterBpmFader",
+      "parameters":
+      {
+        "SpeedMaster": {"type": "Integer", "min":1, "max":16, "default":1, "description":"The number of the SpeedMaster"},
+        "Value": {"type": "Float", "ui":"slider", "min":0, "max":240, "default":0, "mappingIndex": 0}
       }
     },
     "Turn Encoder":
@@ -199,7 +226,8 @@
             "Haze1": "Haze1"
           }
         },
-        "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement"},
+        "isEndlessEncoder": {"type":"Boolean", "default":1, "description":"If the input comes from an endless encoder, the value is incremented/decremented in grandMA3, otherwise the current value is overwritten"},
+        "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement, only relevant for endless encoders"},
         "Value": {"type": "Float", "ui":"slider", "min":-10, "max":10, "default":0, "mappingIndex": 0}
       }
     },

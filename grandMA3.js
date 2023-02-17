@@ -64,9 +64,19 @@ function moveGrandMasterFader(grandMaster, value) {
   local.send("/13.12.2." + grandMaster, "FaderMaster", 1, value*range);
 }
 
+function moveGrandMasterBpmFader(grandMaster, value) {
+  var range = local.parameters.faderRange.get();
+  local.send("/13.12.2." + grandMaster, "FaderMaster", 1, Math.sqrt(value*range/240*100));
+}
+
 function moveSpeedMasterFader(speedMaster, value) {
   var range = local.parameters.faderRange.get();
   local.send("/13.12.3." + speedMaster, "FaderMaster", 1, value*range);
+}
+
+function moveSpeedMasterBpmFader(speedMaster, value) {
+  var range = local.parameters.faderRange.get();
+  local.send("/13.12.3." + speedMaster, "FaderMaster", 1, Math.sqrt(value*range/240*100));
 }
 
 function turnEncoder(encoder, multiplicator, value) {
