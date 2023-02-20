@@ -3,12 +3,12 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.8.1",
+  "version":"0.8.2",
   "description":"A Chataigne module to control grandMA3 via OSC",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
 
-  "hasInput":false,
+  "hasInput":true,
   "hasOutput":true, 
 
   "hideDefaultCommands":true,
@@ -16,7 +16,18 @@
   "defaults":
   {	
     "autoAdd":false,
-    "oscInput": {"localPort":9001}
+    "OSC Outputs": 
+    {
+      "OSC Output": {
+        "local": true,
+        "remoteHost": "192.168.14.152",
+        "remotePort": 8000
+      }
+    },
+    "OSC Input": {
+      "enabled": false,
+      "localPort": 8001
+    }
   },
 
   "parameters":
