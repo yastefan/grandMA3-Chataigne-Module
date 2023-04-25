@@ -47,6 +47,11 @@ function pushExecutorButton(page, executor, offset, value) {
   local.send("/Page" + page + "/Key" + executor + "/", value);
 }
 
+function turnExecutorEncoder(page, executor, offset, multiplicator) {
+  executor = executor + offset;
+  local.send("/Page" + page + "/Encoder" + executor + "/", multiplicator);
+}
+
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
   var range = local.parameters.faderRange.get();
   sequenceNumber = sequenceNumber + offset;
