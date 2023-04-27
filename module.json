@@ -100,7 +100,7 @@
       "parameters":
       {
         "SequenceNumber": {"type":"Integer","min":1,"max":9999,"default":1},
-        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 10 and sequence 2 results in 12"},
+        "Offset": {"type": "Integer", "min":0, "max":9999, "default":0, "description":"e.g. offset 10 and sequence 2 results in 12"},
         "Fader": 
         {
           "type":"Enum", "options": 
@@ -125,7 +125,7 @@
       "parameters":
       {
         "SequenceNumber": {"type":"Integer","min":1,"max":9999,"default":1},
-        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 10 and sequence 2 results in 12"},
+        "Offset": {"type": "Integer", "min":0, "max":9999, "default":0, "description":"e.g. offset 10 and sequence 2 results in 12"},
         "Button": 
         {
           "type":"Enum", "options": 
@@ -237,6 +237,12 @@
             "Dimmer": "Dimmer",
             "Pan": "Pan",
             "Tilt": "Tilt",
+            "Shutter1": "Shutter1",
+            "Prism1": "Prism1",
+            "Focus1": "Focus1",
+            "Zoom": "Zoom",
+            "Gobo1": "Gobo1",
+            "Gobo2": "Gobo2",
             "Color1": "Color1",
             "ColorRGB_R": "ColorRGB_R",
             "ColorRGB_G": "ColorRGB_G",

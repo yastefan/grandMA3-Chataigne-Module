@@ -55,13 +55,13 @@ function turnExecutorEncoder(page, executor, offset, multiplicator) {
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
   var range = local.parameters.faderRange.get();
   sequenceNumber = sequenceNumber + offset;
-  local.send("/13.13.1.5." + sequenceNumber, fader, 1, value*range);
+  local.send("/13.13.1.6." + sequenceNumber, fader, 1, value*range);
 }
 
 function pushSequenceButton(sequenceNumber, offset, button, value) {
   sequenceNumber = sequenceNumber + offset;
   if(value) value = 1;
-  local.send("/13.13.1.5." + sequenceNumber, button, value);
+  local.send("/13.13.1.6." + sequenceNumber, button, value);
 }
 
 function moveGrandMasterFader(grandMaster, value) {
