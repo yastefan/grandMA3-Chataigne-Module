@@ -63,7 +63,7 @@
       "callback":"moveExecutorFader",
       "parameters":
       {
-        "Page": {"type":"Integer","min":0,"max":9,"default":1},
+        "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
         "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
         "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"}, 
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "mappingIndex": 0}
@@ -75,7 +75,7 @@
       "callback":"pushExecutorButton",
       "parameters":
       {
-        "Page": {"type":"Integer","min":0,"max":9,"default":1},
+        "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
         "Executor": {"type": "Integer", "min":1, "max":490, "default":101},
         "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"},
         "Value": {"type": "Boolean", "default":0, "mappingIndex": 0}
@@ -87,7 +87,7 @@
       "callback":"turnExecutorEncoder",
       "parameters":
       {
-        "Page": {"type":"Integer","min":0,"max":9,"default":1},
+        "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
         "Executor": {"type": "Integer", "min":291, "max":490, "default":301},
         "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"},
         "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement, only relevant for endless encoders"}
