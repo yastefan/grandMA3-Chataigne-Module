@@ -38,18 +38,39 @@ function moduleValueChanged(value) {
 function moveExecutorFader(page, executor, offset, value) {
   var range = local.parameters.faderRange.get();
   executor = executor + offset;
-  local.send("/Page" + page + "/Fader" + executor + "/", value*range);
+  if(page == 0)
+  {
+    local.send("/Fader" + executor + "/", value*range);
+  }
+  else
+  {
+    local.send("/Page" + page + "/Fader" + executor + "/", value*range);
+  }
 }
 
 function pushExecutorButton(page, executor, offset, value) {
   if(value) value = 1;
   executor = executor + offset;
-  local.send("/Page" + page + "/Key" + executor + "/", value);
+  if(page == 0)
+  {
+    local.send("/Key" + executor + "/", value);
+  }
+  else
+  {
+    local.send("/Page" + page + "/Key" + executor + "/", value);
+  }
 }
 
 function turnExecutorEncoder(page, executor, offset, multiplicator) {
   executor = executor + offset;
-  local.send("/Page" + page + "/Encoder" + executor + "/", multiplicator);
+  if(page == 0)
+  {
+    local.send("/Encoder" + executor + "/", multiplicator);
+  }
+  else
+  {
+    local.send("/Page" + page + "/Encoder" + executor + "/", multiplicator);
+  }
 }
 
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
