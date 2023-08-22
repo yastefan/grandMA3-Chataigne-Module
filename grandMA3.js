@@ -1,5 +1,3 @@
-const sequenceContainer = {};
-
 function init() {
   script.log('grandMA3 module loaded');
 }
@@ -20,26 +18,25 @@ function moduleValueChanged({ get, name }) {
   sendCommand(`${name} ${get() ? 'on' : 'off'}`);
 }
 
-function sendControlMessage(type, page, executor, offset, value) {
+function sendControlMessage(page, type, executor, offset, value) {
   executor += offset;
-  const prefix = page === 0 ? '' : `/Page${page}`;
-
-  if (type == 'Key') value &&= 1;
-  if (type == 'Fader') value *= getRange();
+  var prefix = page === 0 ? '' : `/Page${page}`;
   
   local.send(`${prefix}/${type}${executor}/`, value);
 }
 
-function moveExecutorFader(...args) {
-  sendControlMessage('Fader', ...args);
+function moveExecutorFader(page, executor, offset, value) {
+  value *= getRange();
+  sendControlMessage(page, 'Fader', executor, offset, value);
 }
 
-function pushExecutorButton(...args) {
-  sendControlMessage('Key', ...args);
+function pushExecutorButton(page, executor, offset, value) {
+  value &= 1;
+  sendControlMessage(page, 'Key', executor, offset, value);
 }
 
-function turnExecutorEncoder(...args) {
-  sendControlMessage('Encoder', ...args);
+function turnExecutorEncoder(page, executor, offset, value) {
+  sendControlMessage(page, 'Encoder', executor, offset, value);
 }
 
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
@@ -49,7 +46,7 @@ function moveSequenceFader(sequenceNumber, offset, fader, value) {
 
 function pushSequenceButton(sequenceNumber, offset, button, value) {
   sequenceNumber += offset;
-  value &&= 1;
+  value &= 1;
   local.send(`/13.13.1.6.${sequenceNumber}`, button, value);
 }
 
@@ -70,7 +67,7 @@ function moveSpeedMasterBpmFader(speedMaster, value) {
 }
 
 function turnEncoder(encoder, multiplicator, value) {
-  const at = value * multiplicator;
+  var at = value * multiplicator;
   script.log(`Attribute ${encoder} at ${at}`);
   sendCommand(`Attribute ${encoder} at ${at}`);
 }
