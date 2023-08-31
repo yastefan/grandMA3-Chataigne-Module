@@ -3,8 +3,8 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"0.8.5",
-  "description":"A Chataigne module to control grandMA3 via OSC",
+  "version":"1.0.0",
+  "description":"A Chataigne module to control grandMA3 via OSC. Attention breaking changes in version 1.0.0 - An update will breake existing mappings. If time critical consider staying on version 0.8.5 for now",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
 
@@ -49,9 +49,44 @@
 
   "values":
   {
-    "Preview": {"type": "Boolean"},
-    "Blind": {"type": "Boolean"},
-    "Freeze": {"type": "Boolean"}
+    "Control": {
+      "type": "Container",
+      "collapsed": true,
+      "Preview": {"type": "Boolean"},
+      "Blind": {"type": "Boolean"},
+      "Freeze": {"type": "Boolean"}
+    },
+    "Startshow": {
+      "type": "Container",
+      "collapsed": true,
+      "Dimmer": {
+        "type": "Container",
+        "DimmerFX1": {"type": "Boolean"},
+        "DimmerFX2": {"type": "Boolean"},
+        "DimmerFX3": {"type": "Boolean"},
+        "DimmerFX4": {"type": "Boolean"},
+        "DimmerFX5": {"type": "Boolean"},
+        "DimmerFX6": {"type": "Boolean"}
+      },
+      "Position": {
+        "type": "Container",
+        "PositionFX1": {"type": "Boolean"},
+        "PositionFX2": {"type": "Boolean"},
+        "PositionFX3": {"type": "Boolean"},
+        "PositionFX4": {"type": "Boolean"},
+        "PositionFX5": {"type": "Boolean"},
+        "PositionFX6": {"type": "Boolean"}
+      },
+      "Color": {
+        "type": "Container",
+        "ColorFX1": {"type": "Boolean"},
+        "ColorFX2": {"type": "Boolean"},
+        "ColorFX3": {"type": "Boolean"},
+        "ColorFX4": {"type": "Boolean"},
+        "ColorFX5": {"type": "Boolean"},
+        "ColorFX6": {"type": "Boolean"}
+      }
+    }
   },
 
   "commands":
@@ -59,7 +94,7 @@
    
    "Move Executor Fader":
     {
-      "menu":"",  
+      "menu":"Executor",  
       "callback":"moveExecutorFader",
       "parameters":
       {
@@ -71,7 +106,7 @@
     },
     "Push Executor Button":
     {
-      "menu":"",  
+      "menu":"Executor",  
       "callback":"pushExecutorButton",
       "parameters":
       {
@@ -83,7 +118,7 @@
     },
     "Turn Executor Encoder":
     {
-      "menu":"",  
+      "menu":"Executor",  
       "callback":"turnExecutorEncoder",
       "parameters":
       {
@@ -93,9 +128,50 @@
         "Multiplicator": {"type": "Float", "min":-10, "max":10, "default":1, "description":"Speed of the encoder movement, only relevant for endless encoders"}
       }
     },
+    "Change Executor Speedscale":
+    {
+      "menu":"Executor",  
+      "callback":"changeExecutorSpeedscale",
+      "parameters":
+      {
+        "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
+        "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
+        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"},
+        "Speedscale": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Div8": "Div8",
+            "Div4": "Div4",
+            "Div2": "Div2",
+            "One": "One",
+            "Mul2": "Mul2",
+            "Mul4": "Mul4",
+            "Mul8": "Mul8"
+          }
+        }
+      }
+    },
+    "Add Executor to SyncList":
+    {
+      "menu":"Executor",  
+      "callback":"addExecutorToSyncList",
+      "parameters":
+      {
+        "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
+        "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
+        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"}
+      }
+    },
+    "Sync Executors":
+    {
+      "menu":"Executor",  
+      "callback":"syncExecutors"
+    },
+
     "Move Sequence Fader":
     {
-      "menu":"",  
+      "menu":"Sequence",  
       "callback":"moveSequenceFader",
       "parameters":
       {
@@ -120,7 +196,7 @@
     },
     "Push Sequence Button":
     {
-      "menu":"",  
+      "menu":"Sequence",  
       "callback":"pushSequenceButton",
       "parameters":
       {
@@ -156,9 +232,9 @@
         "Value": {"type": "Boolean", "default":0, "mappingIndex": 0}
       }
     },
-    "Move GrandMaster Fader":
+    "Move Master Fader":
     {
-      "menu":"",  
+      "menu":"Master",  
       "callback":"moveGrandMasterFader",
       "parameters":
       {
@@ -187,9 +263,9 @@
         "Value": {"type": "Float", "ui":"slider", "min":0, "max":1, "default":0, "mappingIndex": 0}
       }
     },
-    "Move GrandMaster BPM Fader":
+    "Move Master BPM Fader":
     {
-      "menu":"",  
+      "menu":"Master",  
       "callback":"moveGrandMasterBpmFader",
       "parameters":
       {
@@ -206,7 +282,7 @@
     },
     "Move SpeedMaster Fader":
     {
-      "menu":"",  
+      "menu":"Speed",  
       "callback":"moveSpeedMasterFader",
       "parameters":
       {
@@ -216,7 +292,7 @@
     },
     "Move SpeedMaster BPM Fader":
     {
-      "menu":"",  
+      "menu":"Speed",  
       "callback":"moveSpeedMasterBpmFader",
       "parameters":
       {
@@ -226,7 +302,7 @@
     },
     "Turn Encoder":
     {
-      "menu":"",  
+      "menu":"Programmer",  
       "callback":"turnEncoder",
       "parameters":
       {
@@ -259,9 +335,30 @@
         "Value": {"type": "Float", "ui":"slider", "min":-10, "max":10, "default":0, "mappingIndex": 0}
       }
     },
+    "Set Color":
+    {
+      "menu":"Programmer",  
+      "callback":"setProgrammerColor",
+      "parameters":
+      {
+        "Color": {
+          "type": "Color",
+          "default": [1,1,1,1],
+          "mappingIndex": 0
+        },
+        "Layer": 
+        {
+          "type":"Enum", "options": 
+          {
+            "Absolute": "Absolute",
+            "Relative": "Relative"
+          }
+        }
+      }
+    },
     "Send Command":
     {
-      "menu":"",  
+      "menu":"Control",  
       "callback":"sendCommand",
       "parameters":
       {
@@ -270,7 +367,7 @@
     },
     "Set Preview":
     {
-      "menu":"",  
+      "menu":"Control",  
       "callback":"setPreview",
       "parameters":
       {
@@ -279,7 +376,7 @@
     },
     "Set Blind":
     {
-      "menu":"",  
+      "menu":"Control",  
       "callback":"setBlind",
       "parameters":
       {
@@ -288,11 +385,29 @@
     },
     "Set Freeze":
     {
-      "menu":"",  
+      "menu":"Control",  
       "callback":"setFreeze",
       "parameters":
       {
         "status": {"type":"Boolean", "default":0, "mappingIndex": 0}
+      }
+    },
+    "Show Gui":
+    {
+      "menu": "Control",
+      "callback": "showGuiElements",
+      "parameters":
+      {
+        "status": {"type":"Boolean", "default":0, "mappingIndex": 0}
+      }
+    },
+    "Switch View":
+    {
+      "menu": "Control",
+      "callback": "switchView",
+      "parameters":
+      {
+        "view": {"type": "Integer", "min":1, "max":16, "default":1}
       }
     }
   }
