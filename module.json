@@ -3,7 +3,7 @@
   "type":"OSC",
   "path":"Software",
   
-  "version":"1.0.0",
+  "version":"1.0.1",
   "description":"A Chataigne module to control grandMA3 via OSC. Attention breaking changes in version 1.0.0 - An update will breake existing mappings. If time critical consider staying on version 0.8.5 for now",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
@@ -160,13 +160,18 @@
       {
         "Page": {"type":"Integer","min":0,"max":9,"default":1,"description": "By entering page number 0 the current page will be used."},
         "Executor": {"type": "Integer", "min":1, "max":490, "default":201},
-        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description":"e.g. offset 200 and executor 2 results in 202"}
+        "Offset": {"type": "Integer", "min":0, "max":490, "default":0, "description": "e.g. offset 200 and executor 2 results in 202"},
+        "SyncList": {"type": "Integer", "min":1, "max":4, "default":1, "description": "by different synclists you can realize a synchronisiation on different beats"}
       }
     },
     "Sync Executors":
     {
       "menu":"Executor",  
-      "callback":"syncExecutors"
+      "callback":"syncExecutors",
+      "parameters":
+      {
+        "SyncList": {"type": "Integer", "min":1, "max":4, "default":1, "mappingIndex": 0, "description": "by different synclists you can realize a synchronisiation on different beats"}
+      }
     },
 
     "Move Sequence Fader":

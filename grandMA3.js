@@ -1,5 +1,5 @@
 var sequenceContainer = {};
-var sync_queue = [];
+var sync_queue = [[], [], [], []];
 
 function init() {
   script.log("grandMA3 module loaded");
@@ -84,7 +84,7 @@ function changeExecutorSpeedscale(page, executor, offset, scale) {
   local.send("/cmd", command + " Property Speedscale " + scale);
 }
 
-function addExecutorToSyncList(page, executor, offset) {
+function addExecutorToSyncList(page, executor, offset, list) {
   executor = executor + offset;
   var command = "";
 
@@ -96,20 +96,20 @@ function addExecutorToSyncList(page, executor, offset) {
   {
     command = "page " + page + "." + executor;
   }
-  if (sync_queue.indexOf(command) == -1) {
-    sync_queue.push(command);
+  if (sync_queue[list-1].indexOf(command) == -1) {
+    sync_queue[list-1].push(command);
   }
 }
 
-function syncExecutors() {
-  if (sync_queue.length) {
+function syncExecutors(list) {
+  if (sync_queue[list-1].length) {
     command_string = "";
 
-    for (var i = 0; i < sync_queue.length; i++) {
-      command_string = command_string + "goto " + sync_queue[i] + " cue /NC;";
+    for (var i = 0; i < sync_queue[list-1].length; i++) {
+      command_string = command_string + "goto " + sync_queue[list-1][i] + " cue /NC;";
     }
     local.send("/cmd", command_string);
-    sync_queue = [];
+    sync_queue[list-1] = [];
   }
 }
 
