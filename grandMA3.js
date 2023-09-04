@@ -10,7 +10,15 @@ function moduleParameterChanged(param) {
 }
 
 function moduleValueChanged(value) {
-  if (value.getParent().name == "control") {
+  if (value.getParent().getParent().name == "sequences") {
+    if (value.name.indexOf("fader") == 0) {
+      moveSequenceFader(parseInt(value.getParent().name, 10), 0, value.name, value.get());
+    }
+    else {
+      pushSequenceButton(parseInt(value.getParent().name, 10), 0, value.name, value.get());
+    }
+  }
+  else if (value.getParent().name == "control") {
     setControl(value.name, value.get());
   }
   else if (value.getParent().getParent().name == "startshow") {
@@ -214,4 +222,37 @@ function showGuiElements(visible) {
 
 function switchView(view) {
   local.send("/cmd", "call ViewButton 1." + view);
+}
+
+function oscEvent(address, args) {
+  var address_list = address.split(".");
+
+  if (address.indexOf("13.13.1.6") == 1) {
+    processSequence(address_list[address_list.length - 1], args);
+  }
+}
+
+function processSequence(sequence, args) {
+  var sequence_container = script.getParent().getParent().values.sequences[sequence];
+  var range = local.parameters.faderRange.get();
+  var command = args[0].charAt(0).toLowerCase() + args[0].substring(1, args[0].length);
+
+  if(!sequence_container[command] && local.parameters.learnFromOscInput.get()) {
+    var parent_container = script.getParent().getParent().values.addContainer("Sequences");
+    sequence_container = parent_container.addContainer(sequence);
+    if (args.length == 3) {
+      sequence_container.addBoolParameter(args[0], args[0], 0);
+    }
+    sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
+  }
+  if(sequence_container[command]) {
+    if (args.length == 3) {
+      sequence_container.setName(sequence + " | " + args[2], sequence);
+      sequence_container[command].set(args[1]);
+    }
+    else {
+      sequence_container.setName(sequence + " | " + args[3], sequence);
+      sequence_container[command].set(args[2] / range);
+    }
+  }
 }
