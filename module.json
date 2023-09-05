@@ -4,7 +4,7 @@
   "path":"Software",
   
   "version":"1.1.0",
-  "description":"A Chataigne module to control grandMA3 via OSC. Attention breaking changes in version 1.0.0 - An update will breake existing mappings. If time critical consider staying on version 0.8.5 for now",
+  "description":"A Chataigne module to control grandMA3 via OSC. Attention breaking changes in version 1.0.0 - An update will break existing mappings. If time critical consider staying on version 0.8.5 for now",
   "url":"https://github.com/yastefan/grandMA3-Chataigne-Module",
   "downloadURL":"https://github.com/yastefan/grandMA3-Chataigne-Module/archive/refs/heads/main.zip",
 
