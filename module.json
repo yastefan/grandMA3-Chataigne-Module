@@ -432,6 +432,15 @@
       {
         "view": {"type": "Integer", "min":1, "max":16, "default":1}
       }
+    },
+    "Select Page":
+    {
+      "menu": "Control",
+      "callback": "selectPage",
+      "parameters":
+      {
+        "page": {"type": "Integer", "min":1, "default":1}
+      }
     }
   }
 }
