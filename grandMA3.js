@@ -224,6 +224,10 @@ function switchView(view) {
   local.send("/cmd", "call ViewButton 1." + view);
 }
 
+function selectPage(page) {
+  local.send("/cmd", "Select Page " + page);
+}
+
 function oscEvent(address, args) {
   var address_list = address.split(".");
 
