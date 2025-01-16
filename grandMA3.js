@@ -39,9 +39,9 @@ function setFX(fx_group, fx_name, value) {
   var sequence_number = parseInt(fx_name.substring(fx_name.length - 1, fx_name.length), 10);
   var offset = 0;
 
-  if(fx_group == "dimmer") { offset = 5283; }
-  else if(fx_group == "position") { offset = 5289; }
-  else if(fx_group == "color") { offset = 5295; }
+  if(fx_group == "dimmer") { offset = 5454; }
+  else if(fx_group == "position") { offset = 5472; }
+  else if(fx_group == "color") { offset = 5490; }
 
   if(value) {
     pushSequenceButton(sequence_number, offset, "On", 1);
@@ -136,33 +136,33 @@ function turnExecutorEncoder(page, executor, offset, multiplicator) {
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
   var range = local.parameters.faderRange.get();
   sequenceNumber = sequenceNumber + offset;
-  local.send("/13.13.1.6." + sequenceNumber, fader, 1, value*range);
+  local.send("/14.14.1.6." + sequenceNumber, fader, 1, value*range);
 }
 
 function pushSequenceButton(sequenceNumber, offset, button, value) {
   sequenceNumber = sequenceNumber + offset;
   if(value) value = 1;
-  local.send("/13.13.1.6." + sequenceNumber, button, value);
+  local.send("/14.14.1.6." + sequenceNumber, button, value);
 }
 
 function moveGrandMasterFader(grandMaster, value) {
   var range = local.parameters.faderRange.get();
-  local.send("/13.12.2." + grandMaster, "FaderMaster", 1, value*range);
+  local.send("/14.13.2." + grandMaster, "FaderMaster", 1, value*range);
 }
 
 function moveGrandMasterBpmFader(grandMaster, value) {
   var range = local.parameters.faderRange.get();
-  local.send("/13.12.2." + grandMaster, "FaderMaster", 1, Math.sqrt(value/240)*range);
+  local.send("/14.13.2." + grandMaster, "FaderMaster", 1, Math.pow(value, 0.5243838)/0.17118);
 }
 
 function moveSpeedMasterFader(speedMaster, value) {
   var range = local.parameters.faderRange.get();
-  local.send("/13.12.3." + speedMaster, "FaderMaster", 1, value*range);
+  local.send("/14.13.3." + speedMaster, "FaderMaster", 1, value*range);
 }
 
 function moveSpeedMasterBpmFader(speedMaster, value) {
   var range = local.parameters.faderRange.get();
-  local.send("/13.12.3." + speedMaster, "FaderMaster", 1, Math.sqrt(value/240)*range);
+  local.send("/14.13.3." + speedMaster, "FaderMaster", 1, Math.pow(value, 0.5243838)/0.17118);
 }
 
 function turnEncoder(encoder, multiplicator, value) {
@@ -247,7 +247,9 @@ function processSequence(sequence, args) {
     if (args.length == 3) {
       sequence_container.addBoolParameter(args[0], args[0], 0);
     }
-    sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
+    else {
+      sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
+    }
   }
   if(sequence_container[command]) {
     if (args.length == 3) {
