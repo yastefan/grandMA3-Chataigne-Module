@@ -231,7 +231,7 @@ function selectPage(page) {
 function oscEvent(address, args) {
   var address_list = address.split(".");
 
-  if (address.indexOf("13.13.1.6") == 1) {
+  if (address.indexOf("14.14.1.6") == 1) {
     processSequence(address_list[address_list.length - 1], args);
   }
 }
