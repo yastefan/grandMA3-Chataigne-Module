@@ -240,25 +240,50 @@ function processSequence(sequence, args) {
   var sequence_container = script.getParent().getParent().values.sequences[sequence];
   var range = local.parameters.faderRange.get();
   var command = args[0].charAt(0).toLowerCase() + args[0].substring(1, args[0].length);
+  var isFader = command.indexOf("fader") == 0;
 
+  // Learn new parameters if enabled
   if(!sequence_container[command] && local.parameters.learnFromOscInput.get()) {
     var parent_container = script.getParent().getParent().values.addContainer("Sequences");
     sequence_container = parent_container.addContainer(sequence);
-    if (args.length == 3) {
+    
+    if (args.length == 3 && isFader) {
+      sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
+    } else if (args.length == 3) {
       sequence_container.addBoolParameter(args[0], args[0], 0);
-    }
-    else {
+    } else {
       sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
     }
   }
+
+  // Process existing parameters
   if(sequence_container[command]) {
-    if (args.length == 3) {
-      sequence_container.setName(sequence + " | " + args[2], sequence);
+    if (args.length == 2) {
+      // Simple on/off commands: Off 1, Flash 1
       sequence_container[command].set(args[1]);
     }
+    else if (args.length == 3) {
+      if (isFader) {
+        // Fader commands: FaderMaster 1 99.5, FaderSpeed 1 50.0, etc.
+        var value = parseFloat(args[2]);
+        if (value === value) { // Check if not NaN
+          sequence_container[command].set(value / range);
+        }
+      } else {
+        // Button commands with descriptions: Go+ 1 "s1 1 Cue", On 1 "s1 1 Cue"
+        sequence_container.setName(sequence + " | " + args[2], sequence);
+        sequence_container[command].set(args[1]);
+      }
+    }
     else {
+      // 4+ arg messages (if any exist)
       sequence_container.setName(sequence + " | " + args[3], sequence);
-      sequence_container[command].set(args[2] / range);
+      var value = parseFloat(args[2]);
+      if (value === value) { // Check if not NaN
+        sequence_container[command].set(value / range);
+      } else {
+        sequence_container[command].set(args[2]);
+      }
     }
   }
 }
