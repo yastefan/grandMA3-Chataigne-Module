@@ -231,34 +231,270 @@ function selectPage(page) {
 function oscEvent(address, args) {
   var address_list = address.split(".");
 
-  if (address.indexOf("13.13.1.6") == 1) {
+  if (address.indexOf("14.14.1.6") == 1) {
     processSequence(address_list[address_list.length - 1], args);
   }
 }
 
-function processSequence(sequence, args) {
-  var sequence_container = script.getParent().getParent().values.sequences[sequence];
-  var range = local.parameters.faderRange.get();
-  var command = args[0].charAt(0).toLowerCase() + args[0].substring(1, args[0].length);
+// Helper function to parse and scale fader values
+function parseAndScaleFaderValue(valueString, range) {
+  var value = parseFloat(valueString);
+  return (value === value) ? value / range : valueString; // Check if not NaN
+}
 
-  if(!sequence_container[command] && local.parameters.learnFromOscInput.get()) {
-    var parent_container = script.getParent().getParent().values.addContainer("Sequences");
-    sequence_container = parent_container.addContainer(sequence);
-    if (args.length == 3) {
-      sequence_container.addBoolParameter(args[0], args[0], 0);
-    }
-    else {
-      sequence_container.addFloatParameter(args[0], args[0], 0, 0, 1);
-    }
+// Helper function to update sequence name with description
+function updateSequenceName(sequenceContainer, sequence, description) {
+  if (description) {
+    sequenceContainer.setName(sequence + " | " + description, sequence);
   }
-  if(sequence_container[command]) {
-    if (args.length == 3) {
-      sequence_container.setName(sequence + " | " + args[2], sequence);
-      sequence_container[command].set(args[1]);
-    }
-    else {
-      sequence_container.setName(sequence + " | " + args[3], sequence);
-      sequence_container[command].set(args[2] / range);
-    }
+}
+
+// Global tracker for sequence running-states
+var SequenceStateTracker = {
+  runningStates: {},
+  runningParams: {},
+  // Storage for created parameters to avoid timing issues
+  createdParameters: {},
+
+  getRunningState: function(sequence) {
+    return this.runningStates[sequence];
+  },
+
+  setRunningState: function(sequence, state) {
+    this.runningStates[sequence] = state;
+  },
+
+  getRunningParam: function(sequence) {
+    return this.runningParams[sequence];
+  },
+
+  setRunningParam: function(sequence, param) {
+    this.runningParams[sequence] = param;
+  },
+
+  getCreatedParameter: function(sequence, command) {
+    var paramKey = sequence + "_" + command;
+    return this.createdParameters[paramKey];
+  },
+
+  setCreatedParameter: function(sequence, command, param) {
+    var paramKey = sequence + "_" + command;
+    this.createdParameters[paramKey] = param;
   }
+};
+
+// Command mappings that result in a running-state transition
+var PERMANENT_COMMANDS = {
+  "go+": { requiresValueOne: true, setsTo: true },
+  "on": { requiresPositive: true, setsTo: true },
+  "fadermaster": { usesArgs2: true, setsToValue: true },
+  "fadertemp": { usesArgs2: true, setsToValue: true },
+  ">>>": { requiresValueOne: true, setsTo: true },
+  "<<<": { requiresValueOne: true, setsTo: true },
+  "goto": { requiresPositive: true, setsTo: true },
+  "off": { requiresPositive: true, setsTo: false }
+};
+
+// Commands that return to the original running state
+var TEMP_MODIFIERS = {
+  "temp": "positive",
+  "flash": "positive",
+  "black": "negative",
+  "swap": "negative" // MA3 actually spells it this way
+};
+
+var FADER_COMMANDS = {
+  "fadermaster": true,
+  "fadertemp": true
+};
+
+// Helper function to create sequence container
+function createSequenceContainer(sequence) {
+  var parent_container = script.getParent().getParent().values.addContainer("Sequences");
+  return parent_container.addContainer(sequence);
+}
+
+// Helper function to get sequence container
+function getSequenceContainer(sequence) {
+  var sequence_container = script.getParent().getParent().values.sequences[sequence];
+  return sequence_container;
+}
+
+// Helper function to initialize sequence state
+function initializeSequenceState(sequence) {
+  var existingState = SequenceStateTracker.getRunningState(sequence);
+  if (!existingState) {
+    var newState = {
+      permanent: false,
+      tempPositive: false,
+      tempNegative: false
+    };
+    SequenceStateTracker.setRunningState(sequence, newState);
+    return newState;
+  }
+  return existingState;
+}
+
+// Helper function to get or create Running parameter
+function getRunningParameter(sequence, sequence_container) {
+  var existingParam = SequenceStateTracker.getRunningParam(sequence);
+  if (existingParam === undefined) {
+    var runningParamCreated = sequence_container.addBoolParameter("Running", "Running", false);
+    SequenceStateTracker.setRunningParam(sequence, runningParamCreated);
+    return runningParamCreated;
+  }
+  return existingParam;
+}
+
+// Helper function to parse command value
+function parseCommandValue(commandLower, args) {
+  var valueIndex = FADER_COMMANDS[commandLower] ? 2 : 1;
+  return parseFloat(args[valueIndex]);
+}
+
+// Helper function to process permanent state changes
+function processPermanentStateChange(commandLower, value, sequenceState) {
+  var commandConfig = PERMANENT_COMMANDS[commandLower];
+  if (!commandConfig) return false;
+
+  var newValue = commandConfig.setsTo;
+
+  // Check if we should update based on command requirements
+  if (commandConfig.requiresValueOne && value == 1) {
+    sequenceState.permanent = newValue;
+    return true;
+  }
+
+  if (commandConfig.requiresPositive && value > 0) {
+    sequenceState.permanent = newValue;
+    return true;
+  }
+
+  if (commandConfig.setsToValue !== undefined) {
+    sequenceState.permanent = value > 0;
+    return true;
+  }
+
+  return false;
+}
+
+// Helper function to process temporary modifiers
+function processTemporaryModifier(commandLower, value, sequenceState) {
+  var modifierType = TEMP_MODIFIERS[commandLower];
+  if (!modifierType) return false;
+
+  var isPositive = value > 0;
+  if (modifierType === "positive") {
+    sequenceState.tempPositive = isPositive;
+  } else if (modifierType === "negative") {
+    sequenceState.tempNegative = isPositive;
+  }
+  return true;
+}
+
+// Helper function to calculate final running state
+function calculateFinalRunningState(sequenceState) {
+  // Temporary modifiers take precedence over permanent state
+  if (sequenceState.tempPositive) return true;
+  if (sequenceState.tempNegative) return false;
+  return sequenceState.permanent;
+}
+
+// Helper function to learn new parameters
+function learnNewParameter(sequence_container, sequence, command, args, isFader) {
+  var param;
+  // Create the appropriate parameter type based on command and args
+  if (args.length == 3 && isFader) {
+    // Fader commands: FaderMaster, FaderTemp, etc.
+    param = sequence_container.addFloatParameter(command, command, 0, 0, 1);
+  } else if (args.length == 3) {
+    // Button commands
+    param = sequence_container.addBoolParameter(command, command, 0);
+  } else {
+    // Default to float parameter for other cases
+    param = sequence_container.addFloatParameter(command, command, 0, 0, 1);
+  }
+
+  // Store the parameter globally to deal with timing issues in local.values
+  SequenceStateTracker.setCreatedParameter(sequence, command, param);
+
+  return sequence_container;
+}
+
+// Helper function to process existing parameters
+function processExistingParameters(sequence_container, command, args, isFader, range, sequence) {
+  // Try to get parameter from container first, then from our stored parameters
+  var param = sequence_container[command];
+
+  if (!param) {
+    // Try to get from our stored parameters
+    param = SequenceStateTracker.getCreatedParameter(sequence, command);
+    if (!param) return;
+  }
+
+  if (args.length == 2) {
+    // Simple on/off commands: Off 1, Flash 1
+    param.set(args[1]);
+  } else if (args.length == 3) {
+    if (isFader) {
+      // Fader commands: FaderMaster 1 99.5, FaderSpeed 1 50.0, etc.
+      // For fader commands, the actual value is in args[2]
+      var faderValue = parseAndScaleFaderValue(args[2], range);
+      param.set(faderValue);
+    } else {
+      // Button commands with descriptions: Go+ 1 "s1 1 Cue", On 1 "s1 1 Cue"
+      updateSequenceName(sequence_container, sequence, args[2]);
+      param.set(args[1]);
+    }
+  } else if (args.length >= 4) {
+    // 4+ arg messages (if any exist)
+    updateSequenceName(sequence_container, sequence, args[3]);
+    param.set(parseAndScaleFaderValue(args[2], range));
+  }
+}
+
+function processSequence(sequence, args) {
+  var sequence_container = getSequenceContainer(sequence);
+  var range = local.parameters.faderRange.get();
+  var command = args[0];
+  var commandLower = command.toLowerCase();
+  var isFader = commandLower.indexOf("fader") == 0;
+  var learnEnabled = local.parameters.learnFromOscInput.get();
+
+  // Create container if it doesn't exist and learning is enabled
+  if (!sequence_container && learnEnabled) {
+    sequence_container = createSequenceContainer(sequence);
+  }
+
+  // Exit if no container exists
+  if (!sequence_container) {
+    return;
+  }
+
+  // Learn new parameters if enabled
+  if(!sequence_container[command] && learnEnabled) {
+    learnNewParameter(sequence_container, sequence, command, args, isFader);
+  }
+
+  // Initialize sequence state and get Running parameter
+  var sequenceState = initializeSequenceState(sequence);
+  var runningParam = getRunningParameter(sequence, sequence_container);
+
+  // Process running state based on command
+  var value = parseCommandValue(commandLower, args);
+
+  // Handle permanent state changes
+  processPermanentStateChange(commandLower, value, sequenceState);
+
+  // Handle temporary modifiers
+  processTemporaryModifier(commandLower, value, sequenceState);
+
+  // Calculate and update final running state
+  var finalRunningState = calculateFinalRunningState(sequenceState);
+  if (runningParam && typeof runningParam.set === 'function') {
+    runningParam.set(finalRunningState);
+  }
+
+  // Process existing parameters
+  processExistingParameters(sequence_container, command, args, isFader, range, sequence);
 }

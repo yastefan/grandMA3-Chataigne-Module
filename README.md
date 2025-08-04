@@ -20,6 +20,7 @@ The following functions are implemented in the plugin:
 - Sequence
     - Move Sequence Fader
     - Push Sequence Button
+    - Track Sequence Running Status
 - Master
     - Move Master Fader
     - [Move Master BPM Fader](#bpm-faders)
@@ -63,3 +64,38 @@ The BPM faders allow to send BPM values (beats per minute) to executors or maste
 
 GrandMA3 sequences do not know a beat grid and are therefore difficult to synchronize with Resolume, Ableton or CDJs without further tools. In this plugin there are the functions **Add Executor to SyncList** and **Sync Executors** to enable synchronization to beats.  
 **Add Executor to SyncList** Adds an executor to a list of executors to be synchronized. **Sync Executors** then restarts all executors on that list. Typically, Sync Executors is mapped to the beat signal, for example the **new Bar trigger** from Ableton Link. This way you can realize, for example, that dimmer phasers always have their maximum brightness on the kick.  On [freudundlight.de](https://freudundlight.de/Beat-Sync/) you can find an explanation of how you can use this function to realise a beat synchronisation between Pioneer CDJs and grandMA3.
+
+## Sequence Feedback from grandMA3
+
+When _OSC Input_ is configured and enabled, this plugin has the ability to read
+and track various parameters of sequences as they are acted upon in grandMA3.
+
+### Setup
+
+Ensure that _OSC Input_ parameter is enabled and that MA3 has an _In & Out_
+line configured for `Send` and `Send Command` to Chataigne's IP and _Local Port_.
+
+### Learning & Tracking
+
+This plugin can listen for commands and changes to MA3 sequences, allowing you
+to create actions, mappings, and other workflows when -- for example -- a sequence
+fires, stops, its master fader changes, etc.
+
+In order for Chataigne to know about sequences in your show and their various
+parameters, you first need to teach it. Switch on _Learn from oscInput_ in the
+plugin parameters and fire a sequence event, such as a _Go+_, _Temp_, _Flash_, etc.
+The plugin's _Values_ will now contain a _Sequences_ container with your sequence
+number and the command that you triggered (and any associated values).
+
+You only need to use _Learn from oscInput_ during this training phase. As long
+as _OSC Input_ is enabled and the plugin instance knows about your sequences,
+it will continue to receive and update whenever MA3 sends an OSC event.
+
+The plugin features a special parameter in each sequence's value container
+called _Running_. As long as the plugin has simply learned about the existence
+of a sequence, it will attempt to track and follow any changes from MA3 (e.g.
+_Go+_, _Temp_, _Flash_, _Black_, _Swop_, fader movements, and so on) -- regardless
+of whether those parameters were added in the learning phase. If the plugin
+believes your sequence is on/running, the _Running_ value will be `true`,
+and `false` when off/stopped. This can be especially useful in mapping sequences
+to status indicators.
