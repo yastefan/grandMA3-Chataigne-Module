@@ -5,6 +5,32 @@ function init() {
   script.log("grandMA3 module loaded");
 }
 
+function getCompatibility() {
+  var p = local.parameters.compatibility;
+  if (!p) return "2.5";
+  var v = p.get();
+  if (v == undefined || v == null || v == "") return "2.5";
+  var s = "" + v;
+  // Enum.get() may be the option value ("2.2") or the option key ("2.2 - 2.4")
+  if (s == "2.2" || s.indexOf("2.2") == 0) return "2.2";
+  return "2.5";
+}
+
+function getSequenceAddressPrefix() {
+  if (getCompatibility() == "2.2") {
+    return "14.14.1.6";
+  }
+  return "14.14.1.7";
+}
+
+function getSequenceAddress(sequenceNumber) {
+  return "/" + getSequenceAddressPrefix() + "." + sequenceNumber;
+}
+
+function isSequenceOscAddress(address) {
+  return address.indexOf("/" + getSequenceAddressPrefix() + ".") == 0;
+}
+
 function moduleParameterChanged(param) {
   script.log(param.name + " parameter changed, new value: " + param.get());
 }
@@ -136,13 +162,13 @@ function turnExecutorEncoder(page, executor, offset, multiplicator) {
 function moveSequenceFader(sequenceNumber, offset, fader, value) {
   var range = local.parameters.faderRange.get();
   sequenceNumber = sequenceNumber + offset;
-  local.send("/14.14.1.6." + sequenceNumber, fader, 1, value*range);
+  local.send(getSequenceAddress(sequenceNumber), fader, 1, value*range);
 }
 
 function pushSequenceButton(sequenceNumber, offset, button, value) {
   sequenceNumber = sequenceNumber + offset;
   if(value) value = 1;
-  local.send("/14.14.1.6." + sequenceNumber, button, value);
+  local.send(getSequenceAddress(sequenceNumber), button, value);
 }
 
 function moveGrandMasterFader(grandMaster, value) {
@@ -231,7 +257,7 @@ function selectPage(page) {
 function oscEvent(address, args) {
   var address_list = address.split(".");
 
-  if (address.indexOf("14.14.1.6") == 1) {
+  if (isSequenceOscAddress(address)) {
     processSequence(address_list[address_list.length - 1], args);
   }
 }
@@ -245,7 +271,12 @@ function parseAndScaleFaderValue(valueString, range) {
 // Helper function to update sequence name with description
 function updateSequenceName(sequenceContainer, sequence, description) {
   if (description) {
-    sequenceContainer.setName(sequence + " | " + description, sequence);
+    var label = description;
+    var semi = label.indexOf(";");
+    if (semi >= 0) {
+      label = label.substring(0, semi) + " " + label.substring(semi + 1, label.length);
+    }
+    sequenceContainer.setName(sequence + " | " + label, sequence);
   }
 }
 
@@ -403,16 +434,10 @@ function calculateFinalRunningState(sequenceState) {
 // Helper function to learn new parameters
 function learnNewParameter(sequence_container, sequence, command, args, isFader) {
   var param;
-  // Create the appropriate parameter type based on command and args
-  if (args.length == 3 && isFader) {
-    // Fader commands: FaderMaster, FaderTemp, etc.
+  if (isFader) {
     param = sequence_container.addFloatParameter(command, command, 0, 0, 1);
-  } else if (args.length == 3) {
-    // Button commands
-    param = sequence_container.addBoolParameter(command, command, 0);
   } else {
-    // Default to float parameter for other cases
-    param = sequence_container.addFloatParameter(command, command, 0, 0, 1);
+    param = sequence_container.addBoolParameter(command, command, 0);
   }
 
   // Store the parameter globally to deal with timing issues in local.values
