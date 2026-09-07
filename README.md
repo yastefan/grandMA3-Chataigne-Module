@@ -46,6 +46,14 @@ Activate OSC in grandMA3 in the "In & Out" menu. The OSC input must be activated
 
 ![screenshot](https://github.com/yastefan/grandMA3-Chataigne-Module/blob/main/screenshot.png)
 
+## Compatibility
+
+grandMA3 2.5 changed the OSC syntax for sequences. A **Compatibility** dropdown is now in the module Parameters list so you can choose **2.5+** or **2.2 – 2.4**.
+
+**2.5+ is the default.** If you are still on grandMA3 2.2–2.4, switch that dropdown or sequence control will not hit the right objects. This is a potentially breaking change if you update the module while running older than 2.5.
+
+This module requires grandMA3 **2.2 or later**.
+
 ## Encoder
 
 After the first feedback, it becomes clear that the encoder functionality is more important than I would have thought at first. I bought a MidiFighter Twister to test the functions. Since the mapping was too cumbersome for me, I wrote another [Chataigne module](https://github.com/yastefan/MidiEncoder-Chataigne-Module) that facilitates the mapping for endless encoders like in the MidiFighter.  
