@@ -148,14 +148,15 @@ function syncExecutors(list) {
 }
 
 function turnExecutorEncoder(page, executor, offset, multiplicator) {
+  var cleanMultiplicator = Math.round(multiplicator * 100) / 100;
   executor = executor + offset;
   if(page == 0)
   {
-    local.send("/Encoder" + executor + "/", multiplicator);
+    local.send("/Encoder" + executor + "/", cleanMultiplicator);
   }
   else
   {
-    local.send("/Page" + page + "/Encoder" + executor + "/", multiplicator);
+    local.send("/Page" + page + "/Encoder" + executor + "/", cleanMultiplicator);
   }
 }
 
@@ -192,8 +193,9 @@ function moveSpeedMasterBpmFader(speedMaster, value) {
 }
 
 function turnEncoder(encoder, multiplicator, value) {
-  script.log("Attribute " + encoder + " at + " + value*multiplicator);
-  local.send("/cmd", "Attribute " + encoder + " at + " + value*multiplicator);
+  var cleanvalue = Math.round((value * multiplicator) * 100) / 100;
+  script.log("Attribute " + encoder + " at + " + cleanvalue);
+  local.send("/cmd", "Attribute " + encoder + " at + " + cleanvalue);
 }
 
 function setProgrammerColor(color, layer) {

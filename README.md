@@ -1,6 +1,6 @@
 # grandMA3-Chataigne-Module
 
-A Chataigne module to control grandMA3 via OSC
+A Chataigne module to control grandMA3 via OSC, modded to round encoder output to 2 decimals, as MA3 sometimes losts values with 3 or more decimals. Fader output is untouched (on testing)
 
 ## Purpose
 
