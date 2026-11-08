@@ -17,6 +17,7 @@ The following functions are implemented in the plugin:
     - Change Executor Speedscale
     - [Add Executor to SyncList](#sync-executors)
     - [Sync Executors](#sync-executors)
+    - [Learn Executor feedback](#executor-feedback) from [pam-OSC](https://github.com/xxpasixx/pam-osc) LuaPlugin for ***gma3***.
 - Sequence
     - Move Sequence Fader
     - Push Sequence Button
@@ -107,3 +108,45 @@ of whether those parameters were added in the learning phase. If the plugin
 believes your sequence is on/running, the _Running_ value will be `true`,
 and `false` when off/stopped. This can be especially useful in mapping sequences
 to status indicators.
+
+
+
+## Executor Feedback
+When you have the [pam-OSC](https://github.com/xxpasixx/pam-osc) ***LuaPlugin*** running on your ***GrandMA 3***, the the ChataigneModule will recognize its EncoderFeedback when "Learn from OSC" is enabled. And it will keep the learned Executors updated with the ***LuaPlugin***s feedback.
+
+
+### Usage
+
+
+See [setupinstuctions](https://github.com/xxpasixx/pam-osc/wiki/Setup#6-configure-grandma3) for the ***pam-OSC LuaPlugin***.
+
+When the ***ChataignModule*** receives the Output of the ***LuaPlugin***(check this by "Log Incoming" in the ***Module***):
+1. Activate "**Learn from oscInput**" in the ChataigneModule.
+2. Restart the ***LuaPlugin*** in ***gma3***.
+3. Look in the Values of the ***Module***.
+    - There Should be **Containers** Called ```Executors```, ```Status``` and ```Page```.
+4. Open the ```Executors``` Container.
+    - There should be nested **Containers** 101, 201, 301, 401, ... . One for each ```ExecutorId```
+5. Open a ```ExecutorId```s Container
+    - There should be Values like ```Name```, ```Fader```, ```Button```, ```Color```.
+6. Change the ```Page``` in the ***gma3***.
+    - If you have differernt things on your Executors per Page, you should see the ```Name```, ```Color``` and Stuff change with the PageChange in ***gm3***.
+7. Happy Mapping!
+    - Use the Values from the ***gma3*** ChatingeModule to set Things on your MidiController, or what ever you use... . Like set the Color of a controllerButton to the Color of the coresponding ```Executor```.
+    - Use the Commands of the ***gma3*** ChataingeModule to controll the ***gma3***. Like **pushExecutorButton** when an Button is presed on your MidiController.
+
+
+### Tracked Features
+
+
+**Per Executor**:
+- ```Name```: String. The Name of the Sequence assigned to the Executor.
+- ```Current Cue```: String. The Name of the running Cue of the Sequence assinged to the Executor.
+- ```Color```: Array[r,g,b,a]. The BackgroundColor of the Appeareance assigned to the Sequence assigned to the Executor.
+- ```Fader```: Float. The Value of the Fader/Knob of the Executor. (201 has a Fader, 401 has a Knob, but both are called Fader)
+- ```Button```: Boolean. The State of the Button of the Executor, in repect to their assigned Function. (Like Toggle or Flash where for Toggle youd have to press the Button 2 times to get an "on" and "off" cycle, while for Flash its only on when pressed "on" and "off" when released.)
+
+**Gloabl**:
+- ```currentPage```: Integer. The Page of Executors currently activ on the ***gma3***.
+- ```deskLocked```: Boolean. True if the ***gma3*** is currently locked.
+    - For example to display a fancy Pattern as a Lockscreen on the Controller, or just to prohibit controll of the ***gma3***.

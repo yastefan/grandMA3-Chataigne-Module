@@ -1,8 +1,13 @@
+// Aktuell
 var sequenceContainer = {};
+var executorContainer = {};
 var sync_queue = [[], [], [], []];
 
 function init() {
   script.log("grandMA3 module loaded");
+
+  script.getParent().getParent().parameters.removeParameter("clearValues"); // Remove default clearValues to avoid Controll and StartShow values beeing cleared.
+  script.getParent().getParent().parameters.addTrigger("Clear Values", "Clear all Learned Values");
 }
 
 function getCompatibility() {
@@ -32,7 +37,35 @@ function isSequenceOscAddress(address) {
 }
 
 function moduleParameterChanged(param) {
-  script.log(param.name + " parameter changed, new value: " + param.get());
+  script.log(param.name + " parameter changed");
+
+  if(param.name == "clearValues"){
+    if(script.getParent().getParent().values.sequences){
+      script.log("func: " + "oscEvent" + "; " + "cleared sequences");
+      script.getParent().getParent().values.removeContainer("sequences");
+
+      sequenceContainer = {};
+      sync_queue = [[], [], [], []];
+
+      // Clear SequenceTraking
+      SequenceStateTracker.runningStates = {};
+      SequenceStateTracker.runningParams = {};
+      SequenceStateTracker.createdParameters = {};
+    }
+    if(script.getParent().getParent().values.executors){
+      script.log("func: " + "oscEvent" + "; " + "cleared executors");
+      script.getParent().getParent().values.removeContainer("executors");
+      executorContainer = {};
+    }
+    if(script.getParent().getParent().values.status){
+      script.log("func: " + "oscEvent" + "; " + "cleared status");
+      script.getParent().getParent().values.removeContainer("status");
+    }
+    if(script.getParent().getParent().values.page){
+      script.log("func: " + "oscEvent" + "; " + "cleared page");
+      script.getParent().getParent().values.removeContainer("page");
+    }
+  }
 }
 
 function moduleValueChanged(value) {
@@ -137,7 +170,7 @@ function addExecutorToSyncList(page, executor, offset, list) {
 
 function syncExecutors(list) {
   if (sync_queue[list-1].length) {
-    command_string = "";
+    var command_string = "";
 
     for (var i = 0; i < sync_queue[list-1].length; i++) {
       command_string = command_string + "goto " + sync_queue[list-1][i] + " cue /NC;";
@@ -260,6 +293,21 @@ function oscEvent(address, args) {
   if (isSequenceOscAddress(address)) {
     processSequence(address_list[address_list.length - 1], args);
   }
+
+  // PamOSC-Plugin-gma3: /Page1/Fader204 : 76
+  if (address.indexOf("Page") == 1) {
+    processExec(address_list[address_list.length - 1], args);
+  }
+
+  // PamOSC-Plugin-gma3: /updatePage/current : 1
+  if (address.indexOf("updatePage") == 1) {
+    processUpdatePage(address_list[address_list.length - 1], args);
+  }
+
+  // PamOSC-Plugin-gma3: /status/deskLocked : 0
+  if (address.indexOf("status") == 1) {
+    processStatus(address_list[address_list.length - 1], args);
+  }
 }
 
 // Helper function to parse and scale fader values
@@ -347,7 +395,7 @@ function createSequenceContainer(sequence) {
 
 // Helper function to get sequence container
 function getSequenceContainer(sequence) {
-  var sequence_container = script.getParent().getParent().values.sequences[sequence];
+  var sequence_container = script.getParent().getParent().getChild("values").getChild("values")[sequence]; // Using getChild() to get an fresh Object tree from the C++ MainApplication to avoid errors on external tree changes. (ie. after clearValues Parameter) 
   return sequence_container;
 }
 
@@ -522,4 +570,287 @@ function processSequence(sequence, args) {
 
   // Process existing parameters
   processExistingParameters(sequence_container, command, args, isFader, range, sequence);
+}
+
+// PamOSC-Plugin-gma3: /updatePage/current : 1
+function processUpdatePage(page, args){
+  var param = splitAlphaNumeric(page); // expects: "/updatePage/current" -> returns: [updatePage, current]
+  var statusName = param[1]; 
+  var statusLable = firstLetterToUppercase(statusName); 
+  var statusValue = args[0]; // args[] = [3] -> args[0]=3 => pageNumber
+
+  var valueContainers = script.getParent().getParent().getChild("Values");
+  if(local.parameters.learnFromOscInput.get()){
+
+    var state_container = valueContainers.getChild("Page");
+    if(state_container == null){
+      state_container = valueContainers.addContainer("Page");
+    }
+    if(state_container != null){
+      if(statusName == "current"){
+        state_container.addIntParameter(statusLable, statusName, 0, 0, 9999);
+      }
+    }
+  }
+
+  var state_container = valueContainers.getChild("Page");
+  if(state_container != null){
+    var statusName_param = state_container.getChild(statusName);
+    if(statusName_param != null){
+      statusName_param.set(statusValue); // Expects interger value
+    }
+  }
+}
+
+// PamOSC-Plugin-gma3: /status/deskLocked : 0
+function processStatus(status, args){
+  var param = splitAlphaNumeric(status); // expects: "/status/deskLocked" -> returns: [status, deskLooked]
+  var statusName = param[1]; 
+  var statusLable = firstLetterToUppercase(statusName); 
+  var statusValue = args[0]; // args[] = [true] -> args[0]=true => lockedStatus, true=locked or false=unlocked
+
+  var valueContainers = script.getParent().getParent().getChild("Values");
+  if(local.parameters.learnFromOscInput.get()){
+    var state_container = valueContainers.getChild("Status");
+    if(state_container == null){
+      state_container = valueContainers.addContainer("Status");
+    }
+    if(state_container != null){
+      if(statusName == "deskLocked"){
+        state_container.addBoolParameter(statusLable, statusName, 0);
+      }
+    }
+  }
+
+  var state_container = valueContainers.getChild("Status");
+  if(state_container != null){
+    var statusName_param = state_container.getChild(statusName);
+    if(statusName_param != null){
+      statusName_param.set(statusValue); // Expects boolean value
+    }
+  }
+}
+
+
+// PamOSC-Plugin-gma3: /Page1/Fader204 : 76
+// PamOSC-Plugin-gma3: /Page1/Name204 : "Sequence 21"
+// PamOSC-Plugin-gma3: /Page1/Button204 : true
+// PamOSC-Plugin-gma3: /Page1/Color204 : "r;g;b;α" (ie.: "255;255;0;255" for full Orange)
+function processExec(executor, args) {  
+  var param = splitAlphaNumeric(executor); // expects: "/Page1/Fader204" -> returns: ["Page", "1", "Fader", "204"]
+  var execLabel = param[2] + " " + param[3]; // expected result: "Fader 201" 
+  var execName = param[2] + param[3]; 
+  execName = firstLetterToLowercase(execName); // expected result: "fader201" 
+  var execPage = param[1];
+  var execType = param[2];
+  var execId = param[3];
+  var execValue = args[0]; // args[] = [76] -> args[0]=76 => or a String for the Name, Color or a boolean for the Button...
+    
+  var valueContainers = script.getParent().getParent().getChild("Values");
+  
+  /*
+  value_cont -> executors_cont  -> execId_cont -> execName_param
+  --------------------------------------------------
+  values     ->   Executors     ->     201     -> fader201
+                                               -> button201
+                                               -> name201
+  
+                              ->    301        -> button301
+                                               -> name301
+  */
+ 
+ if(local.parameters.learnFromOscInput.get()){
+   var executors_container = valueContainers.getChild("Executors");
+   if(executors_container == null){
+     executors_container = valueContainers.addContainer("Executors");
+    }
+    if(executors_container != null){
+      var executorId_container = executors_container.getChild(execId);
+      
+      if(executorId_container == null){
+        executorId_container = executors_container.addContainer(execId);  
+      }
+      if(executorId_container != null){
+        var execName_param = executorId_container.getChild(execName);
+        
+        if(execName_param == null){
+          if(execType == "Button"){
+            executorId_container.addBoolParameter(execLabel, execName, 0);
+          }
+          if(execType == "Fader"){
+            executorId_container.addFloatParameter(execLabel, execName, 0, 0, 1);
+          }
+          if(execType == "Name"){
+            execValue = execValue.split(";");
+
+            var execCueName = "currentCue" + execId;
+            var execCueLable = "Current Cue " + execId;
+
+            executorId_container.addStringParameter(execLabel, execName, execValue[0]);
+            executorId_container.addStringParameter(execCueLable, execCueName, execValue[1]);
+          }
+          if(execType == "Color"){
+            var execRgbaArray = execValue.split(";");
+            execRgbaArray = arrayMap(execRgbaArray, stringToFloat);
+            execRgbaArray = arrayMap(execRgbaArray, normalizeFloat);
+            
+            executorId_container.addColorParameter(execLabel, execName, 0);
+          }
+        }
+        if(execName_param != null){
+
+        }
+      }
+    }
+  }
+  
+  var executors_container = valueContainers.getChild("Executors");
+  if(executors_container != null){
+
+    var executorId_container = executors_container.getChild(execId);
+    if(executorId_container != null){
+
+      var execName_param = executorId_container.getChild(execName);
+      if(execName_param != null){
+
+        if(execType == "Button"){
+          var state = execValue == "On";
+          execName_param.set(state);
+        }
+        if(execType == "Fader"){
+          var range = local.parameters.faderRange.get();
+          execName_param.set(parseFloat(execValue/range));
+        }
+        if(execType == "Name"){
+          var execValType = typeof execValue;
+          execValType == "object" ? nill : execValue = execValue.split(";");
+
+          var execCueName = "currentCue" + execId;
+          var execCueName_param = executorId_container.getChild(execCueName);
+
+          execName_param.set(execValue[0]);
+          execCueName_param.set(execValue[1]);
+        }
+        if(execType == "Color"){
+          var execRgbaArray = execValue.split(";");
+          execRgbaArray = arrayMap(execRgbaArray, stringToFloat);
+          execRgbaArray = arrayMap(execRgbaArray, normalizeFloat);
+          
+          execName_param.set(execRgbaArray);
+        }
+      }
+    }
+  }
+  
+}
+
+/**
+ * Parses an integer from a value.
+ * @param {string|number} item The value to parse.
+ * @returns {number} The parsed integer, or NaN if it cannot be parsed.
+ */
+function stringToFloat(item){
+    item = parseInt(item);
+    return item;
+  };
+
+  /**
+   * Scales a value from the 0–255 range to the 0–1 range.
+   * Values outside the input range are not clamped.
+   * @param {number} value The value to normalize.
+   * @returns {number} The value divided by 255.
+   */
+  function normalizeFloat(value){
+    // normalized_value = range_min + ((value - original_min) * (range_max - range_min)) / (original_max - original_min)
+    return 0 + ((value - 0) * (1 - 0)) / (255 - 0); 
+  };
+
+  /**
+   * Rotates an array one position to the right, moving its last item to the front.
+   * @param {Array} arr The array to rotate.
+   * @returns {Array} A new array containing the rotated items.
+   */
+  function shiftArrayElements(arr){
+    // for (var i = 0; i < arr.length; i++) out.push(fn(arr[i], i));
+    var arrOld = arr;
+    var arrLength = arr.length;
+    var arrNew = [];
+    for(var i = 1; i <= arrLength; i++){
+      arrNew[(i%arrLength)] = arrOld[i-1];
+    }
+    return arrNew;
+  }
+
+/**
+ * Splits a string into letter and digit runs without using regular expressions.
+ * Non-ASCII-alphanumeric characters act as delimiters, and changes between
+ * letters and digits start a new part.
+ *
+ * @param {string} value The input string to split.
+ * @returns {string[]} The alphanumeric parts in their original order.
+ */
+function splitAlphaNumeric(value) {
+  var parts = [];
+  var part = "";
+  var previousIsDigit = false;
+
+  for (var i = 0; i < value.length; i++) {
+    var character = value.charAt(i);
+    var isDigit = character >= "0" && character <= "9";
+    var isLetter = (character >= "A" && character <= "Z") ||
+      (character >= "a" && character <= "z");
+
+    if (!isDigit && !isLetter) {
+      if (part.length > 0) {
+        parts.push(part);
+        part = "";
+      }
+      continue;
+    }
+
+    if (part.length > 0 && isDigit != previousIsDigit) {
+      parts.push(part);
+      part = "";
+    }
+
+    part += character;
+    previousIsDigit = isDigit;
+  }
+
+  if (part.length > 0) {
+    parts.push(part);
+  }
+
+  return parts;
+}
+
+/**
+ * Converts the first character of a string to lowercase.
+ * @param {string} string The input string.
+ * @returns {string} The string with its first character lowercased.
+ */
+function firstLetterToLowercase(string){
+  return string.charAt(0).toLowerCase() + string.substring(1, string.length);
+}
+
+/**
+ * Converts the first character of a string to uppercase.
+ * @param {string} string The input string.
+ * @returns {string} The string with its first character uppercased.
+ */
+function firstLetterToUppercase(string){
+  return string.charAt(0).toUpperCase() + string.substring(1, string.length);
+}
+
+/**
+ * Maps each array item through a callback, passing the item and its index.
+ * @param {Array} arr The input array.
+ * @param {function(*, number): *} fn Callback invoked with each item and index.
+ * @returns {Array} A new array containing the callback results.
+ */
+function arrayMap(arr, fn)
+{
+    var out = [];
+    for (var i = 0; i < arr.length; i++) out.push(fn(arr[i], i));
+    return out;
 }
